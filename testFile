@@ -1,0 +1,20 @@
+node('master') {
+  checkout scm
+  stage('Build') {
+	withMaven(globalMavenSettingsConfig: '--- Use system default settings or file path ---', jdk: '--- Use system default JDK ---', maven: 'M3', mavenSettingsConfig: '--- Use system default settings or file path ---', traceability: false) {
+    
+    if(isUnix()){
+    sh 'mvn -Dmaven.test.failure.ignore clean package'
+    }
+    else {
+      bat 'mvn -Dmaven.test.failure.ignore clean package'
+    }
+  }
+  }
+  
+  stage('Result'){
+    juint'**/target/surefire-reports/Test-*.xml'
+    archive 'target/*.jar'
+  }
+}
+
